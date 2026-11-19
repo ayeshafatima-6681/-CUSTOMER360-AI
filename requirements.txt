@@ -1,0 +1,16 @@
+# Core Analytics & Data Processing
+pandas>=2.0.0
+numpy>=1.24.0
+pyarrow>=12.0.0
+
+# Machine Learning & Explainability
+scikit-learn>=1.3.0
+xgboost>=2.0.0
+joblib>=1.3.0
+
+# Interactive Dashboard & Visualization
+streamlit>=1.28.0
+plotly>=5.15.0
+
+# Testing & Quality Assurance
+pytest>=7.4.0

@@ -1,0 +1,33 @@
+{
+  "dataset_name": "IBM Telco Customer Churn",
+  "license": "Apache 2.0 / Open IBM Sample Data",
+  "source_url": "https://raw.githubusercontent.com/IBM/telco-customer-churn-on-icp4d/master/data/Telco-Customer-Churn.csv",
+  "download_timestamp_utc": "2026-11-19T19:59:53.105643+00:00",
+  "rows": 7043,
+  "columns": 21,
+  "column_names": [
+    "customerID",
+    "gender",
+    "SeniorCitizen",
+    "Partner",
+    "Dependents",
+    "tenure",
+    "PhoneService",
+    "MultipleLines",
+    "InternetService",
+    "OnlineSecurity",
+    "OnlineBackup",
+    "DeviceProtection",
+    "TechSupport",
+    "StreamingTV",
+    "StreamingMovies",
+    "Contract",
+    "PaperlessBilling",
+    "PaymentMethod",
+    "MonthlyCharges",
+    "TotalCharges",
+    "Churn"
+  ],
+  "file_size_bytes": 970457,
+  "provenance_note": "Genuine public IBM Telco Customer Churn sample for churn prediction research."
+}
