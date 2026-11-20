@@ -6,21 +6,33 @@ Main Streamlit Application Controller.
 import sys
 from pathlib import Path
 
-# Add project root to sys.path to ensure absolute package imports work seamlessly
+# Add project root and app directory to sys.path to ensure both direct and package imports resolve
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
-if str(PROJECT_ROOT) not in sys.path:
-    sys.path.insert(0, str(PROJECT_ROOT))
+APP_DIR = Path(__file__).resolve().parent
+for p in [str(PROJECT_ROOT), str(APP_DIR)]:
+    if p not in sys.path:
+        sys.path.insert(0, p)
 
 import streamlit as st
 
-from app.components.styles import CUSTOM_CSS
-from app.components.executive import render_executive_overview
-from app.components.analytics import render_customer_analytics
-from app.components.prediction import render_churn_prediction
-from app.components.explainability_view import render_explainability_view
-from app.components.retention_sim import render_retention_simulator
-from app.components.performance import render_model_performance
-from app.components.data_quality import render_data_quality
+try:
+    from components.styles import CUSTOM_CSS
+    from components.executive import render_executive_overview
+    from components.analytics import render_customer_analytics
+    from components.prediction import render_churn_prediction
+    from components.explainability_view import render_explainability_view
+    from components.retention_sim import render_retention_simulator
+    from components.performance import render_model_performance
+    from components.data_quality import render_data_quality
+except (ModuleNotFoundError, ImportError):
+    from app.components.styles import CUSTOM_CSS
+    from app.components.executive import render_executive_overview
+    from app.components.analytics import render_customer_analytics
+    from app.components.prediction import render_churn_prediction
+    from app.components.explainability_view import render_explainability_view
+    from app.components.retention_sim import render_retention_simulator
+    from app.components.performance import render_model_performance
+    from app.components.data_quality import render_data_quality
 
 
 def main():
