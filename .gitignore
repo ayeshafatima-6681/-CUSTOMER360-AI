@@ -24,8 +24,14 @@ venv.bak/
 htmlcov/
 *.cover
 
+# Logs & Temporary Files
+*.log
+logs/
+*.tmp
+
 # Streamlit Local Cache & Configs
 .streamlit/secrets.toml
+.streamlit/
 
 # IDE & Editor Settings
 .vscode/

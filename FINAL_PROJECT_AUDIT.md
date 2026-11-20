@@ -196,7 +196,7 @@ The automated test suite in `tests/` covers unit tests, integration tests, schem
 ============================= test session starts =============================
 platform win32 -- Python 3.13.13, pytest-9.2.0, pluggy-1.7.0
 cachedir: .pytest_cache
-rootdir: C:\Users\ayesha fatima\OneDrive\Documents\CUSTOMER360 AI
+rootdir: CUSTOMER360 AI
 plugins: anyio-4.16.0
 collected 38 items
 
