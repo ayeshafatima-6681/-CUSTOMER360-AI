@@ -13,7 +13,13 @@ from app.components.analytics import render_customer_analytics
 from app.components.explainability_view import render_explainability_view
 from app.components.performance import render_model_performance
 from app.components.data_quality import render_data_quality
-from app.components.prediction import render_churn_prediction
+from app.components.prediction import render_churn_prediction, render_batch_prediction
+from src.ml.predict import ChurnPredictor
+
+
+@pytest.fixture(scope="module")
+def predictor():
+    return ChurnPredictor()
 
 
 def test_custom_css_is_non_empty():
@@ -59,6 +65,15 @@ def test_render_data_quality():
 def test_render_churn_prediction(mock_btn, mock_chart):
     """Verify churn prediction page renders without import or execution errors."""
     render_churn_prediction()
+
+
+@patch("streamlit.download_button")
+@patch("streamlit.dataframe")
+@patch("streamlit.button", return_value=True)
+def test_render_batch_prediction_workflow(mock_btn, mock_df_render, mock_dl, predictor):
+    """Verify batch prediction renders sorted preview table without TypeError."""
+    render_batch_prediction(predictor)
+    assert mock_df_render.called
 
 
 def test_plotly_express_bar_chart_shap():

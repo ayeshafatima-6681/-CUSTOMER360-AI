@@ -421,7 +421,7 @@ def render_batch_prediction(predictor: ChurnPredictor):
             ]
             valid_cols = [c for c in cols_to_show if c in scored_df.columns]
             st.dataframe(
-                scored_df[valid_cols].sort_values("churn_probability", reverse=True),
+                scored_df[valid_cols].sort_values("churn_probability", ascending=False),
                 use_container_width=True,
             )
 

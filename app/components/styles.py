@@ -78,6 +78,12 @@ CUSTOM_CSS = """
         color: #64748b;
     }
 
+    /* Streamlit Native Metric Sizing for Responsive Cards */
+    [data-testid="stMetricValue"] {
+        font-size: 1.55rem !important;
+        white-space: nowrap;
+    }
+
     /* Risk Badges */
     .badge-critical {
         background-color: #fee2e2;

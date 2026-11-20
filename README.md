@@ -5,7 +5,7 @@
 [![XAI](https://img.shields.io/badge/Explainability-Tree%20SHAP-10B981)](#-explainable-ai-xai--tree-shap-attribution)
 [![Database](https://img.shields.io/badge/Database-SQLite%203-003B57?logo=sqlite&logoColor=white)](https://www.sqlite.org/)
 [![Dashboard](https://img.shields.io/badge/Dashboard-Streamlit-FF4B4B?logo=streamlit&logoColor=white)](https://streamlit.io/)
-[![Testing](https://img.shields.io/badge/Tests-33%20Passed-brightgreen?logo=pytest&logoColor=white)](https://docs.pytest.org/)
+[![Testing](https://img.shields.io/badge/Tests-38%20Passed-brightgreen?logo=pytest&logoColor=white)](https://docs.pytest.org/)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 
 An enterprise-grade, end-to-end Data Science and Decision Intelligence platform engineered to diagnose customer churn risk, explain individual customer attrition drivers with **Tree SHAP**, quantify enterprise monthly revenue exposure, and simulate targeted retention campaign ROI using **7,043 authentic IBM Telco customer accounts**.
@@ -19,7 +19,7 @@ In recurring subscription businesses (telecommunications, SaaS, streaming servic
 **CUSTOMER360 AI** bridges the gap between raw statistical modeling and executive decision-making:
 - **Diagnoses Macro Risk:** Analyzes 7,043 customer accounts representing **$456,116/month in recurring billing**, identifying that churned customers represent **$139,130/month (30.5%)** of enterprise billing exposure.
 - **Predicts Attrition Risk:** Deploys a calibrated **XGBoost classifier** achieving **0.8467 Test ROC-AUC** and an optimized **0.1361 Brier score** via Sigmoidal Platt scaling.
-- **Explains Why Accounts Churn:** Computes exact **Tree SHAP** feature attributions natively via XGBoost's inference engine (`pred_contribs=True`), breaking down top risk drivers and protective factors for any single customer.
+- **Explains Why Accounts Churn:** Computes exact **Tree SHAP** feature attributions natively via XGBoost's inference engine (`pred_contribs=True`), breaking down top risk drivers and protective factors for any single customer mapped directly to their actual submitted values.
 - **Prescribes Business Interventions:** Automatically maps predicted risk into 4 operational tiers (**Critical**, **High**, **Medium**, **Low**), recommends targeted offers based on empirical churn drivers, and provides an interactive **Retention Campaign ROI Simulator** to forecast net value saved and break-even acceptance rates.
 
 ---
@@ -46,7 +46,7 @@ flowchart TD
 
     subgraph Intelligence["3. Decision Support & Explainability"]
         Saved --> Inf["Inference Service (src.ml.predict)"]
-        Inf --> SHAP["Native Tree SHAP Attributions<br/>(Local & Global Feature Drivers)"]
+        Inf --> SHAP["Native Tree SHAP Attributions<br/>(Customer-Attributed Feature Drivers)"]
         Inf --> Strat["Operational Risk Stratification<br/>(Critical, High, Medium, Low)"]
         Inf --> Actions["Prescriptive Retention Actions<br/>(Rules & Rationale)"]
         Strat --> Sim["Retention Campaign Simulator<br/>(Budget ROI & Sensitivity Curve)"]
@@ -121,7 +121,7 @@ Rather than relying on black-box predictions, the platform implements **Tree SHA
 5. **`tenure` (-0.029):** Established customer age continuously depresses churn likelihood.
 
 ### 2. Local Individual Prediction Explanations
-For any single customer, the platform decomposes the prediction into exact additive SHAP margin contributions, outputting clear **risk-increasing drivers**, **protective factors**, and an automated natural-language narrative.
+For any single customer, the platform decomposes the prediction into exact additive SHAP margin contributions aggregated back to the customer's actual input attributes (e.g. `Contract Commitment: Month-to-month`, `Tenure: 2 mos`, `Internet Technology: Fiber optic`), outputting clear **risk-increasing drivers**, **protective factors**, and an automated natural-language narrative.
 
 > **Data Science Governance Note:** Feature attributions quantify statistical association in historical data, not verified causal mechanisms. Prescriptive retention campaigns should be validated through randomized A/B control groups.
 
@@ -191,13 +191,13 @@ python -m src.ml.train
 ```powershell
 python -m streamlit run app/app.py
 ```
-Open your browser at `http://localhost:8501`.
+Open your browser at `http://localhost:8501` (or the port reported by Streamlit).
 
 ### 4. Execute the Test Suite
 ```powershell
 python -m pytest -v
 ```
-All **33 automated tests** execute and pass in under 10 seconds.
+All **38 automated tests** execute and pass in under 10 seconds.
 
 ---
 
@@ -209,11 +209,34 @@ All **33 automated tests** execute and pass in under 10 seconds.
 | `tests/test_preprocessing.py` | TotalCharges blank string imputation, derived features, pipeline transforms | ✅ 3 Passed |
 | `tests/test_database.py` | SQLite connection, table row counts, all 10 SQL analytical queries | ✅ 5 Passed |
 | `tests/test_ml_models.py` | Artifact persistence, 5-fold CV metrics, ROC-AUC > 0.80 assertions | ✅ 3 Passed |
-| `tests/test_inference.py` | Single prediction schema, batch scoring, tenure=0 edge case handling | ✅ 3 Passed |
-| `tests/test_explainability.py` | Global feature ranking, individual exact Tree SHAP attributions | ✅ 2 Passed |
+| `tests/test_inference.py` | Single prediction schema, batch scoring, tenure=0 edge case, threshold consistency | ✅ 4 Passed |
+| `tests/test_explainability.py` | Global feature ranking, exact Tree SHAP attributions, feature fidelity | ✅ 3 Passed |
 | `tests/test_decision_intelligence.py` | Risk tiering logic, CLV proxies, retention rules, simulator math | ✅ 4 Passed |
-| `tests/test_app_integration.py` | UI component rendering, custom CSS, integration controllers | ✅ 6 Passed |
-| **Total** | **Comprehensive end-to-end test suite** | **✅ 33 / 33 Passed** |
+| `tests/test_app_integration.py` | UI component rendering, custom CSS, batch prediction workflow, Plotly Express SHAP | ✅ 9 Passed |
+| **Total** | **Comprehensive end-to-end test suite** | **✅ 38 / 38 Passed** |
+
+---
+
+## 💼 Accurate Resume Bullet Points
+
+- **Data Scientist / ML Engineer Resume:**
+  > *"Architected an end-to-end customer churn prediction and retention decision intelligence platform on 7,043 enterprise accounts, deploying an XGBoost classifier with Sigmoidal Platt calibration that achieved 0.8467 Test ROC-AUC and a 16.3% Brier score improvement (0.1361) across stratified 5-fold cross-validation."*
+  > *"Engineered native Tree SHAP explainability pipelines decomposing individual customer predictions into feature-level margin attributions faithful to submitted inputs, resolving one-hot dummy misalignment and publishing correlation-vs-causation governance standards."*
+  > *"Built an enterprise SQLite warehouse with 10 analytical queries mapping $139K/mo revenue exposure, a 7-view interactive Streamlit BI dashboard, and a retention campaign ROI simulator with a 38-test automated Pytest validation suite."*
+
+---
+
+## 🎙️ Two-Minute Interview Pitch
+
+> *"CUSTOMER360 AI is an end-to-end customer churn prediction and retention decision intelligence platform built on 7,043 authentic IBM Telco customer accounts.*
+>
+> *The business motivation was that in subscription services, customer churn directly degrades recurring revenue and customer equity. Looking at the raw data, our SQL analytical warehouse revealed that while overall churn was 26.5%, lost billing represented over $139,000 per month—or 30.5% of total enterprise billing. The highest attrition occurred in Month-to-Month contracts at 42.7% versus just 2.8% on Two-Year agreements, and among Electronic Check payers at 45.3%.*
+>
+> *On the modeling side, we trained Logistic Regression, Random Forest, and XGBoost using a leakage-free ColumnTransformer pipeline with Stratified 5-Fold Cross-Validation on 5,634 training accounts. XGBoost emerged as the best candidate with a 0.8480 CV ROC-AUC and 0.8438 on the unseen held-out test set of 1,409 accounts. To ensure our probabilities reflect true empirical risk rather than tree-ensemble overconfidence, we applied Sigmoidal Platt Scaling, which brought the Brier calibration loss down from 0.1627 to 0.1361 and improved test ROC-AUC to 0.8467.*
+>
+> *For explainability, we leveraged native Tree SHAP to decompose predictions into exact additive margin attributions mapped back to the customer's actual input values, avoiding misleading dummy feature labels. We then operationalized this into four risk tiers—Critical, High, Medium, and Low—and built an interactive Retention Campaign Simulator in Streamlit that models intervention costs, acceptance rates, and break-even ROI.*
+>
+> *The entire codebase is verified with 38 automated Pytest tests, adhering to strict data engineering and software engineering standards."*
 
 ---
 
@@ -239,7 +262,7 @@ CUSTOMER360 AI/
 ├── src/                              # Production Python package
 │   ├── data/                         # Ingestion, validation, preprocessing
 │   └── ml/                           # Training, calibration, inference
-├── tests/                            # 33-test automated Pytest suite
+├── tests/                            # 38-test automated Pytest suite
 ├── .gitignore
 ├── README.md
 └── requirements.txt
