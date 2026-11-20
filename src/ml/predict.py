@@ -129,6 +129,7 @@ class ChurnPredictor:
         # Transform features and predict probability
         X_trans = self.preprocessor.transform(df)
         prob = float(self.model.predict_proba(X_trans)[0, 1])
+        raw_prob = float(self.raw_model.predict_proba(X_trans)[0, 1])
         prediction = 1 if prob >= threshold else 0
         risk_tier = classify_risk_tier(prob)
 
@@ -145,7 +146,9 @@ class ChurnPredictor:
             "churn_prediction": "Churn" if prediction == 1 else "Retained",
             "prediction_binary": prediction,
             "churn_probability": round(prob, 4),
+            "raw_probability": round(raw_prob, 4),
             "churn_risk_score_pct": round(prob * 100.0, 1),
+            "raw_risk_score_pct": round(raw_prob * 100.0, 1),
             "risk_tier": risk_tier,
             "threshold_used": threshold,
             "value_metrics": value_metrics,
@@ -153,7 +156,7 @@ class ChurnPredictor:
         }
 
         if include_explanation:
-            explanation = self.explainer.explain_instance(df)
+            explanation = self.explainer.explain_instance(df, calibrated_probability=prob)
             response["explanation"] = explanation
 
         return response

@@ -43,11 +43,47 @@ def test_predict_single_structure(predictor):
     assert "churn_prediction" in res
     assert res["churn_prediction"] in ["Churn", "Retained"]
     assert 0.0 <= res["churn_probability"] <= 1.0
+    assert "raw_probability" in res
+    assert 0.0 <= res["raw_probability"] <= 1.0
     assert res["risk_tier"] in ["Low", "Medium", "High", "Critical"]
     assert "value_metrics" in res
     assert "recommended_actions" in res
     assert "explanation" in res
     assert len(res["recommended_actions"]) > 0
+
+
+def test_predict_single_threshold_consistency(predictor):
+    """Verify classification label strictly follows the decision threshold relative to calibrated probability."""
+    sample = {
+        "gender": "Female",
+        "SeniorCitizen": 0,
+        "Partner": "No",
+        "Dependents": "No",
+        "tenure": 3,
+        "PhoneService": "Yes",
+        "MultipleLines": "No",
+        "InternetService": "Fiber optic",
+        "OnlineSecurity": "No",
+        "OnlineBackup": "No",
+        "DeviceProtection": "No",
+        "TechSupport": "No",
+        "StreamingTV": "Yes",
+        "StreamingMovies": "No",
+        "Contract": "Month-to-month",
+        "PaperlessBilling": "Yes",
+        "PaymentMethod": "Electronic check",
+        "MonthlyCharges": 85.0,
+        "TotalCharges": 255.0,
+    }
+    # Test high threshold (e.g. 0.95 -> should be Retained)
+    res_high_th = predictor.predict_single(sample, threshold=0.95)
+    assert res_high_th["churn_prediction"] == "Retained"
+    assert res_high_th["prediction_binary"] == 0
+
+    # Test low threshold (e.g. 0.10 -> should be Churn)
+    res_low_th = predictor.predict_single(sample, threshold=0.10)
+    assert res_low_th["churn_prediction"] == "Churn"
+    assert res_low_th["prediction_binary"] == 1
 
 
 def test_predict_batch(predictor):

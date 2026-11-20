@@ -5,6 +5,7 @@ Provides single customer real-time inference with archetypes and batch file scor
 
 import streamlit as st
 import plotly.graph_objects as go
+import plotly.express as px
 import pandas as pd
 import numpy as np
 
@@ -245,8 +246,11 @@ def render_single_prediction(predictor: ChurnPredictor):
         st.markdown("#### 🎯 Prediction Results & Risk Diagnostics")
 
         prob = result["churn_probability"]
+        raw_prob = result.get("raw_probability", prob)
         tier = result["risk_tier"]
         val_met = result["value_metrics"]
+        pred_label = result["churn_prediction"]
+        pred_binary = result["prediction_binary"]
 
         r1, r2, r3, r4 = st.columns(4)
         with r1:
@@ -259,14 +263,14 @@ def render_single_prediction(predictor: ChurnPredictor):
             st.metric(
                 label="Risk Tier",
                 value=tier,
-                delta=f"{result['churn_prediction']} Predicted",
-                delta_color="inverse" if result["prediction_binary"] == 1 else "normal",
+                delta=f"Predicted: {pred_label} (Cutoff: {threshold:.2f})",
+                delta_color="inverse" if pred_binary == 1 else "normal",
             )
         with r2:
             st.metric(
                 label="Calibrated Churn Probability",
                 value=f"{prob * 100:.1f}%",
-                delta=f"Threshold: {threshold:.2f}",
+                delta=f"Raw Tree Score: {raw_prob * 100:.1f}%",
             )
         with r3:
             st.metric(
@@ -282,6 +286,16 @@ def render_single_prediction(predictor: ChurnPredictor):
                 delta=f"Tenure: {tenure} mos",
             )
 
+        # Transparency Box on Probability Calibration vs Raw Tree Score vs Decision Cutoff
+        with st.expander("ℹ️ Model Scoring, Calibration & Decision Consistency Details", expanded=False):
+            st.markdown(
+                f"""
+                - **Calibrated Churn Probability ({prob * 100:.1f}%):** Computed via **Sigmoidal Platt Scaling** (`CalibratedClassifierCV`) on the trained model. This is the **authoritative operational probability** used for risk classification, risk tiering (`{tier}`), and revenue exposure calculations.
+                - **Raw Tree Ensemble Score ({raw_prob * 100:.1f}%):** The uncalibrated score from the raw XGBoost boosted decision trees. Tree SHAP feature contributions are computed directly in this raw log-odds margin space.
+                - **Classification Decision ({pred_label}):** Derived by comparing the calibrated probability (`{prob * 100:.1f}%`) against your selected decision threshold (`{threshold * 100:.1f}%`). Because `{prob * 100:.1f}%` {'≥' if pred_binary == 1 else '<'} `{threshold * 100:.1f}%`, the customer is classified as **{pred_label}**.
+                """
+            )
+
         # Gauge Chart for Probability
         g1, g2 = st.columns([1, 1.3])
         with g1:
@@ -289,7 +303,7 @@ def render_single_prediction(predictor: ChurnPredictor):
                 go.Indicator(
                     mode="gauge+number",
                     value=prob * 100,
-                    title={"text": "Churn Probability (%)"},
+                    title={"text": "Calibrated Churn Risk (%)"},
                     gauge={
                         "axis": {"range": [0, 100]},
                         "bar": {"color": tier_colors.get(tier, "#3b82f6")},
@@ -330,7 +344,7 @@ def render_single_prediction(predictor: ChurnPredictor):
             exp = result["explanation"]
             st.caption(exp["narrative_summary"])
 
-            top_drivers = exp["top_risk_drivers"][:5] + exp["top_protective_factors"][:5]
+            top_drivers = exp["top_risk_drivers"][:6] + exp["top_protective_factors"][:6]
             if top_drivers:
                 shap_df = pd.DataFrame(top_drivers)
                 fig_shap = px.bar(
@@ -343,11 +357,11 @@ def render_single_prediction(predictor: ChurnPredictor):
                         "Increases Risk": "#ef4444",
                         "Reduces Risk": "#22c55e",
                     },
-                    labels={"shap_contribution": "SHAP Margin Contribution", "feature": "Customer Feature"},
+                    labels={"shap_contribution": "SHAP Margin Contribution", "feature": "Customer Attribute & Submitted Value"},
                 )
                 fig_shap.update_layout(
                     margin=dict(t=10, b=10, l=10, r=10),
-                    height=280,
+                    height=320,
                     yaxis=dict(autorange="reversed"),
                 )
                 st.plotly_chart(fig_shap, use_container_width=True)
